@@ -16,7 +16,7 @@ def create():
     """ create new key:value pair and save it to db """
     data = request.get_json()
     db.values.insert_one(data)
-    return jsonify({'message': 'Value created successfully!'})
+    return jsonify({'message': 'Value created successfully!'}), 201
 
 
 @app.route('/api/read', methods=['GET'])
@@ -26,12 +26,21 @@ def read():
     return dumps(data)
 
 
+@app.route('/api/read/<string:key>', methods=['GET'])
+def read_by_key(key):
+    """returns object by key"""
+    data = db.values.find({'key': key})
+    if data:
+        return dumps(data)
+    return jsonify({"message": f'object with key {key} doesn`t exist'}), 404
+
+
 @app.route('/api/update', methods=['PUT'])
 def update():
     """updates object in database"""
     data = request.get_json()
     db.values.update_one({'key': data['key']}, {'$set': {'value': data['value']}})
-    return jsonify({'message': 'Value updated successfully!'})
+    return jsonify({'message': 'Value updated successfully!'}), 204
 
 
 # run
